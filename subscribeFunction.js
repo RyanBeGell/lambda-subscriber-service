@@ -39,18 +39,35 @@ async function subscribeUser(email) {
   await dynamodb.put(params).promise();
 }
 
-// Function to send confirmation email
-async function sendConfirmationEmail(email, confirmationToken) {
-  //TODO: Use SES to send the email
-  //TODO: Include the confirmation token in the email body
-}
 
-// Function to confirm subscription
 async function confirmSubscription(email, confirmationToken) {
-  //TODO: Verify the token against DynamoDB
-  //TODO: Update the 'Confirmed' field to true
-}
+  const params = {
 
+    TableName: '', 
+    Key: {
+      Email: email,
+    },
+    UpdateExpression: 'SET Confirmed = :confirmed',
+    ConditionExpression: 'attribute_exists(Email) AND attribute_not_exists(Confirmed)',
+    ExpressionAttributeValues: {
+      ':confirmed': true,
+    },
+  };
+
+  try {
+    await dynamodb.update(params).promise();
+    // Successfully confirmed subscription
+  } catch (error) {
+    
+    //TODO: Error handling 
+    if (error.name === 'ConditionalCheckFailedException') {
+      // User is already confirmed or doesn't exist
+
+    } else {
+      throw error;
+    }
+  }
+}
 // Function to unsubscribe user
 async function subscribeUser(email) {
   const params = {
