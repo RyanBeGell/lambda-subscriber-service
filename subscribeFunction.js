@@ -1,6 +1,31 @@
 const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
+
+async function sendConfirmationEmail(email, confirmationToken) {
+  const ses = new AWS.SES();
+
+  const params = {
+    Destination: {
+      ToAddresses: [email],
+    },
+    Message: {
+      Body: {
+        Text: {
+          Data: `Thank you for subscribing. To confirm your subscription, click this link: https://example.com/confirm?token=${confirmationToken}`,
+        },
+      },
+      Subject: {
+        Data: 'Confirm your subscription',
+      },
+    },
+    Source: '', 
+  };
+
+  await ses.sendEmail(params).promise();
+}
+
+
 // Function to subscribe a user
 async function subscribeUser(email) {
   const params = {
@@ -27,13 +52,14 @@ async function confirmSubscription(email, confirmationToken) {
 }
 
 // Function to unsubscribe user
-async function unsubscribeUser(email) {
+async function subscribeUser(email) {
   const params = {
-    TableName: '',
-    Key: {
+    TableName: '', 
+    Item: {
       Email: email,
+      Confirmed: false,
     },
   };
 
-  await dynamodb.delete(params).promise();
+  await dynamodb.put(params).promise();
 }
