@@ -57,14 +57,25 @@ async function confirmSubscription(email, confirmationToken) {
   try {
     await dynamodb.update(params).promise();
     // Successfully confirmed subscription
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Subscription confirmed successfully' }),
+    };
   } catch (error) {
-    
-    //TODO: Error handling 
+    //dynamoDB conditionalCheckFailed exception
     if (error.name === 'ConditionalCheckFailedException') {
       // User is already confirmed or doesn't exist
-
+      console.log('User is already confirmed or doesn\'t exist.');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'User is already confirmed or doesn\'t exist' }),
+      };
     } else {
-      throw error;
+      console.error('Error confirming subscription:', error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Internal server error' }),
+      };
     }
   }
 }
