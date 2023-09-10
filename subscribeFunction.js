@@ -79,15 +79,3 @@ async function confirmSubscription(email, confirmationToken) {
     }
   }
 }
-// Function to unsubscribe user
-async function subscribeUser(email) {
-  const params = {
-    TableName: '', 
-    Item: {
-      Email: email,
-      Confirmed: false,
-    },
-  };
-
-  await dynamodb.put(params).promise();
-}
