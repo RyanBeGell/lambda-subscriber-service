@@ -6,17 +6,27 @@ exports.handler = async (event) => {
     const token = event.queryStringParameters.token;
 
     // Retrieve the email associated with the token
-    // This requires you to store the association between tokens and emails somewhere, 
-    // possibly in another DynamoDB table or as part of the BlogSubscribers table
-    
-    const email = 'email_retrieved_based_on_token'; //TODO: Replace with actual logic to retrieve email
+    const response = await DynamoDB.scan({
+        TableName: 'BlogSubscribers',
+        FilterExpression: 'verificationToken = :t',
+        ExpressionAttributeValues: { ':t': token }
+    }).promise();
 
-    // Update DynamoDB
+    // Check if a record with the given token was found
+    if (response.Items.length === 0) {
+        return { statusCode: 404, body: JSON.stringify({ message: 'Token not found' }) };
+    }
+
+    // Assuming token is unique and only one record will be returned
+    const email = response.Items[0].email;
+
+    // Update DynamoDB to mark the email as subscribed
     await DynamoDB.update({
         TableName: 'BlogSubscribers',
         Key: { email },
         UpdateExpression: 'set isSubscribed = :v',
-        ExpressionAttributeValues: { ':v': true }
+        ExpressionAttributeValues: { ':v': true },
+        ReturnValues: 'UPDATED_NEW'
     }).promise();
 
     return { statusCode: 200, body: JSON.stringify({ message: 'Subscription confirmed' }) };
