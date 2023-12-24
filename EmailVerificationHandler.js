@@ -26,7 +26,7 @@ exports.handler = async (event) => {
         Key: { email },
         UpdateExpression: 'set isSubscribed = :v',
         ExpressionAttributeValues: { ':v': true },
-        ReturnValues: 'UPDATED_NEW'
+        ConditionExpression: 'attribute_exists(email)' // Ensure the email exists
     }).promise();
 
     return { statusCode: 200, body: JSON.stringify({ message: 'Subscription confirmed' }) };
