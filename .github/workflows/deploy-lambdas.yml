@@ -1,0 +1,30 @@
+name: Deploy Lambda Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Zip and Deploy SubscriptionRequestHandler
+        run: |
+          zip SubscriptionRequestHandler.zip SubscriptionRequestHandler.js
+          aws lambda update-function-code --function-name SubscriptionRequestHandler --zip-file fileb://SubscriptionRequestHandler.zip
+
+      - name: Zip and Deploy EmailVerificationHandler
+        run: |
+          zip EmailVerificationHandler.zip EmailVerificationHandler.js
+          aws lambda update-function-code --function-name EmailVerificationHandler --zip-file fileb://EmailVerificationHandler.zip
