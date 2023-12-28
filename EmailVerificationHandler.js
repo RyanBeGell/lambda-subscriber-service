@@ -2,32 +2,46 @@ const AWS = require('aws-sdk');
 const DynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    // Parse verification token from the query string
-    const token = event.queryStringParameters.token;
+  // Check if queryStringParameters is present and has the token
+  if (!event.queryStringParameters || !event.queryStringParameters.token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: 'Token query parameter is missing' }),
+    };
+  }
 
-    // Retrieve the email associated with the token
-    const response = await DynamoDB.scan({
-        TableName: 'BlogSubscribers',
-        FilterExpression: 'verificationToken = :t',
-        ExpressionAttributeValues: { ':t': token }
-    }).promise();
+  // Parse verification token from the query string
+  const token = event.queryStringParameters.token;
 
-    // Check if a record with the given token was found
-    if (response.Items.length === 0) {
-        return { statusCode: 404, body: JSON.stringify({ message: 'Token not found' }) };
-    }
+  // Retrieve the email associated with the token
+  const response = await DynamoDB.scan({
+    TableName: 'BlogSubscribers',
+    FilterExpression: 'verificationToken = :t',
+    ExpressionAttributeValues: { ':t': token },
+  }).promise();
 
-    // Assuming token is unique and only one record will be returned
-    const email = response.Items[0].email;
+  // Check if a record with the given token was found
+  if (response.Items.length === 0) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ message: 'Token not found' }),
+    };
+  }
 
-    // Update DynamoDB to mark the email as subscribed
-    await DynamoDB.update({
-        TableName: 'BlogSubscribers',
-        Key: { email },
-        UpdateExpression: 'set isSubscribed = :v',
-        ExpressionAttributeValues: { ':v': true },
-        ConditionExpression: 'attribute_exists(email)' // Ensure the email exists
-    }).promise();
+  // Assuming token is unique and only one record will be returned
+  const email = response.Items[0].email;
 
-    return { statusCode: 200, body: JSON.stringify({ message: 'Subscription confirmed' }) };
+  // Update DynamoDB to mark the email as subscribed
+  await DynamoDB.update({
+    TableName: 'BlogSubscribers',
+    Key: { email },
+    UpdateExpression: 'set isSubscribed = :v',
+    ExpressionAttributeValues: { ':v': true },
+    ConditionExpression: 'attribute_exists(email)', // Ensure the email exists
+  }).promise();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: 'Subscription confirmed' }),
+  };
 };
