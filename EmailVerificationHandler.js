@@ -41,7 +41,9 @@ exports.handler = async (event) => {
   }).promise();
 
   return {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Subscription confirmed' }),
+    statusCode: 302,
+    headers: {
+      Location: 'http://localhost:3000/subscription-confirmed'
+    }
   };
 };
