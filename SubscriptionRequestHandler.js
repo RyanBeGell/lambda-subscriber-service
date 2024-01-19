@@ -28,14 +28,18 @@ exports.handler = async (event) => {
         // Construct verification link
         const verificationLink = `${process.env.VERIFICATION_LINK_BASE_URL}/verify?token=${verificationToken}`;
 
+        // Construct unsubscribe link
+        const unsubscribeLink = `${process.env.VERIFICATION_LINK_BASE_URL}/unsubscribe?token=${verificationToken}`;
+
+
         // SES email parameters
         const params = {
-            Source: 'noreply@ryanbegell.com',
+            Source: 'noreply@yourdomain.com',
             Destination: { ToAddresses: [email] },
             Message: {
                 Subject: { Data: 'Blog Subscription Verification' },
                 Body: {
-                    Text: { Data: `Please click the following link to verify your subscription: ${verificationLink}` }
+                    Text: { Data: `Please click the following link to verify your subscription: ${verificationLink}\n\nTo unsubscribe, click here: ${unsubscribeLink}` }
                 }
             }
         };
