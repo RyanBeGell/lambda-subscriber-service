@@ -34,7 +34,7 @@ exports.handler = async (event) => {
 
         // SES email parameters
         const params = {
-            Source: 'noreply@yourdomain.com',
+            Source: 'noreply@ryanbegell.com',
             Destination: { ToAddresses: [email] },
             Message: {
                 Subject: { Data: 'Blog Subscription Verification' },
