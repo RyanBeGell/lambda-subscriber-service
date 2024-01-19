@@ -28,3 +28,8 @@ jobs:
         run: |
           zip EmailVerificationHandler.zip EmailVerificationHandler.js
           aws lambda update-function-code --function-name EmailVerificationHandler --zip-file fileb://EmailVerificationHandler.zip
+
+      - name: Zip and Deploy UnsubscribeHandler
+        run: |
+          zip UnsubscribeHandler.zip UnsubscribeHandler.js
+          aws lambda update-function-code --function-name UnsubscribeHandler --zip-file fileb://UnsubscribeHandler.zip
