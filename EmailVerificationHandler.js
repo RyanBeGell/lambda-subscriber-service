@@ -43,7 +43,7 @@ exports.handler = async (event) => {
   return {
     statusCode: 302,
     headers: {
-      Location: 'http://localhost:3000/subscription-confirmed'
+      Location: 'http://localhost:3000/subscriptions/subscription-confirmed'
     }
   };
 };
