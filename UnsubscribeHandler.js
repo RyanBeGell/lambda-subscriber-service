@@ -3,7 +3,10 @@ const DynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
   if (!event.queryStringParameters || !event.queryStringParameters.token) {
-    return { statusCode: 400, body: JSON.stringify({ message: 'Token query parameter is missing' }) };
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: 'Token query parameter is missing' }),
+    };
   }
 
   const token = event.queryStringParameters.token;
@@ -16,7 +19,10 @@ exports.handler = async (event) => {
   }).promise();
 
   if (response.Items.length === 0) {
-    return { statusCode: 404, body: JSON.stringify({ message: 'Token not found' }) };
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ message: 'Token not found' }),
+    };
   }
 
   const email = response.Items[0].email;
@@ -27,13 +33,17 @@ exports.handler = async (event) => {
     Key: { email },
     UpdateExpression: 'set isSubscribed = :v',
     ExpressionAttributeValues: { ':v': false },
-    ConditionExpression: 'attribute_exists(email)'
+    ConditionExpression: 'attribute_exists(email)',
   }).promise();
 
   return {
     statusCode: 302,
     headers: {
-      Location: 'http://localhost:3000/subscriptions/unsubscribe-confirmed'
-    }
+      Location: 'http://localhost:3000/subscriptions/unsubscribe-confirmed',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+    },
   };
 };
