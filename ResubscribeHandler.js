@@ -13,42 +13,57 @@ exports.handler = async (event) => {
   // Parse re-subscription token from the query string
   const token = event.queryStringParameters.token;
 
-  // Retrieve the email associated with the token
-  const response = await DynamoDB.scan({
-    TableName: 'BlogSubscribers',
-    FilterExpression: 'verificationToken = :t',
-    ExpressionAttributeValues: { ':t': token },
-  }).promise();
+  try {
+    // Retrieve the email associated with the token
+    const scanResponse = await DynamoDB.scan({
+      TableName: 'BlogSubscribers',
+      FilterExpression: 'verificationToken = :t',
+      ExpressionAttributeValues: { ':t': token },
+    }).promise();
 
-  // Check if a record with the given token was found
-  if (response.Items.length === 0) {
+    if (scanResponse.Items.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Token not found' }),
+      };
+    }
+
+    const email = scanResponse.Items[0].email;
+
+    try {
+      // Update DynamoDB to mark the email as re-subscribed
+      await DynamoDB.update({
+        TableName: 'BlogSubscribers',
+        Key: { email },
+        UpdateExpression: 'set isSubscribed = :v',
+        ExpressionAttributeValues: { ':v': true },
+        ConditionExpression: 'attribute_exists(email)',
+      }).promise();
+
+      // Redirect to a confirmation page
+      return {
+        statusCode: 302,
+        headers: {
+          Location: `http://localhost:3000/subscriptions/re-subscription-confirmed`,
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+          'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+        },
+        body: JSON.stringify({ message: 'Re-subscription successful' }),
+      };
+    } catch (updateError) {
+      console.error('Error updating DynamoDB:', updateError);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ message: 'Error updating subscription status' }),
+      };
+    }
+  } catch (scanError) {
+    console.error('Error scanning DynamoDB:', scanError);
     return {
-      statusCode: 404,
-      body: JSON.stringify({ message: 'Token not found' }),
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Internal Server Error' }),
     };
   }
-
-  const email = response.Items[0].email;
-
-  // Update DynamoDB to mark the email as re-subscribed
-  await DynamoDB.update({
-    TableName: 'BlogSubscribers',
-    Key: { email },
-    UpdateExpression: 'set isSubscribed = :v',
-    ExpressionAttributeValues: { ':v': true },
-    ConditionExpression: 'attribute_exists(email)', // Ensure the email exists
-  }).promise();
-
-  // Redirect to a confirmation page or show a success message
-  return {
-    statusCode: 302,
-    headers: {
-      Location: `http://localhost:3000/subscriptions/re-subscription-confirmed`,
-      "Access-Control-Allow-Headers" : "Content-Type",
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
-      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-    },
-    body: JSON.stringify({ message: 'Re-subscription successful' }),
-  };
 };
