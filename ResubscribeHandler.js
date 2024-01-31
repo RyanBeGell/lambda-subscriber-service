@@ -44,7 +44,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 302,
         headers: {
-          Location: `http://localhost:3000/subscriptions/re-subscription-confirmed`,
+          Location: `http://localhost:3000/subscriptions/subscription-confirmed`,
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Credentials': true,
