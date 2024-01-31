@@ -33,3 +33,8 @@ jobs:
         run: |
           zip UnsubscribeHandler.zip UnsubscribeHandler.js
           aws lambda update-function-code --function-name UnsubscribeHandler --zip-file fileb://UnsubscribeHandler.zip
+
+      - name: Zip and Deploy ResubscribeHandler
+        run: |
+          zip ResubscribeHandler.zip ResubscribeHandler.js
+          aws lambda update-function-code --function-name ResubscribeHandler --zip-file fileb://ResubscribeHandler.zip          
