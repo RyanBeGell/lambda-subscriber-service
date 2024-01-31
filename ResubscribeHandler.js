@@ -42,7 +42,7 @@ exports.handler = async (event) => {
 
       // Redirect to a confirmation page
       return {
-        statusCode: 302,
+        statusCode: 200,
         headers: {
           Location: `http://localhost:3000/subscriptions/subscription-confirmed`,
           'Access-Control-Allow-Headers': 'Content-Type',
@@ -50,7 +50,7 @@ exports.handler = async (event) => {
           'Access-Control-Allow-Credentials': true,
           'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
         },
-        body: JSON.stringify({ message: 'Re-subscription successful' }),
+        body: JSON.stringify({ message: 'Re-subscription successful', redirectUrl: 'http://localhost:3000/subscriptions/subscription-confirmed' }),
       };
     } catch (updateError) {
       console.error('Error updating DynamoDB:', updateError);
