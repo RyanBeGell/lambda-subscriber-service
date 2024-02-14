@@ -1,5 +1,7 @@
 const AWS = require('aws-sdk');
 const DynamoDB = new AWS.DynamoDB.DocumentClient();
+const crypto = require('crypto');
+
 
 exports.handler = async (event) => {
   // Check if queryStringParameters is present and has the token
@@ -11,7 +13,7 @@ exports.handler = async (event) => {
   }
 
   // Parse verification token from the query string
-  const token = event.queryStringParameters.token;
+  const token = crypto.randomUUID();
 
   // Retrieve the email associated with the token
   const response = await DynamoDB.scan({
