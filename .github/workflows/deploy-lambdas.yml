@@ -12,6 +12,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install Dependencies
+        run: npm install
+
       - name: Set up AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -21,20 +29,20 @@ jobs:
 
       - name: Zip and Deploy SubscriptionRequestHandler
         run: |
-          zip SubscriptionRequestHandler.zip SubscriptionRequestHandler.js
+          zip -r SubscriptionRequestHandler.zip SubscriptionRequestHandler.js node_modules
           aws lambda update-function-code --function-name SubscriptionRequestHandler --zip-file fileb://SubscriptionRequestHandler.zip
 
       - name: Zip and Deploy EmailVerificationHandler
         run: |
-          zip EmailVerificationHandler.zip EmailVerificationHandler.js
+          zip -r EmailVerificationHandler.zip EmailVerificationHandler.js node_modules
           aws lambda update-function-code --function-name EmailVerificationHandler --zip-file fileb://EmailVerificationHandler.zip
 
       - name: Zip and Deploy UnsubscribeHandler
         run: |
-          zip UnsubscribeHandler.zip UnsubscribeHandler.js
+          zip -r UnsubscribeHandler.zip UnsubscribeHandler.js node_modules
           aws lambda update-function-code --function-name UnsubscribeHandler --zip-file fileb://UnsubscribeHandler.zip
 
       - name: Zip and Deploy ResubscribeHandler
         run: |
-          zip ResubscribeHandler.zip ResubscribeHandler.js
-          aws lambda update-function-code --function-name ResubscribeHandler --zip-file fileb://ResubscribeHandler.zip          
+          zip -r ResubscribeHandler.zip ResubscribeHandler.js node_modules
+          aws lambda update-function-code --function-name ResubscribeHandler --zip-file fileb://ResubscribeHandler.zip
