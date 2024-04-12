@@ -58,7 +58,7 @@ exports.handler = async (event) => {
             </head>
             <body>
               <center>
-                <img src="https://raw.githubusercontent.com/RyanBeGell/portfolio-site/main/public/favicon.png" height="64" "Logo" style="margin-bottom: 8px;">
+                <img src="https://raw.githubusercontent.com/RyanBeGell/portfolio-site/main/public/favicon.png" height="64" width="64 "Logo" style="margin-bottom: 8px;">
                 <div class="header">Please Confirm Your Subscription</div>
                 <br/>
                 <br/>
