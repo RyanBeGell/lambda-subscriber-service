@@ -14,7 +14,7 @@ exports.handler = async (event) => {
     };
   }
 
-  const verificationToken = crypto.randomBytes(16).toString('hex');
+  const verificationToken =  crypto.randomUUID();
 
   // Check environment variable
   if (!process.env.VERIFICATION_LINK_BASE_URL) {

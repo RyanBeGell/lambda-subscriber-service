@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   }
 
   // Parse verification token from the query string
-  const token = crypto.randomUUID();
+  const token = event.queryStringParameters.token;
 
   // Retrieve the email associated with the token
   const response = await DynamoDB.scan({
